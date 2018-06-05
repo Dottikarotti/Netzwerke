@@ -15,6 +15,7 @@ dbtropes_rdf.parse("/home/heckelenme/tvtropes_projektseminar/dbtropes_snapshot.n
 featureliste = []
 werkliste = []
 filter_werkliste = []
+comedytrope_liste = []
 bipartite_kantenliste = []
 knotenliste = []
 typeliste = []
@@ -80,8 +81,33 @@ print(filter_werkliste)
 
 #Jetzt haben wir zumindest mal eine Liste von Filmen aus dem "Rated M for Manly" Genre.
 
+#3. Query: Comedy Tropes
+#Der Query holt alle Tropes aus dem Datensatz, die über "processingCategory2" mit der ComedyTropes
+#Ressource verbunden sind (sprich, alle Comedy Tropes).
+query_output = dbtropes_rdf.query(
+        """
+        SELECT ?trope
+        WHERE {
+            ?trope <http://dbtropes.org/ont/processingCategory2> <http://dbtropes.org/resource/Main/ComedyTropes>
+        }
+        """
+    )
 
-#BEISPIELCODE FÜR TROPES VON HERR HECKELEN - FUNKTIONIERT EVENTUELL NOCH NICHT
+#Ausführung und Füllen der Liste.
+for row in query_output:
+    comedytrope_liste.extend(row)
+
+#Test zum Anzeigen der Comedy Trope Liste.
+print(comedytrope_liste)
+
+#4. Query: Tropes der Filme
+#Der Query läuft per for-Schleife über die gefilterte Werkliste.
+#Hier wird wieder eine Variable "trope" definiert. Hier wird die "Auflösung" der komplizierten
+#Feature-Verbindung komplett in den Query gepackt. Heißt:
+#"String des Films" - hasFeature - beliebige FeatureID
+#beliebige FeatureID - type - beliebiges Trope
+#Dieses beliebige Trope brauchen wir. Das ganze wird pro Werk so oft gemacht, wie das Werk Tropes
+#besitzt.
 for filterwerk in filter_werkliste:
     query_output = dbtropes_rdf.query(
         """
@@ -92,9 +118,20 @@ for filterwerk in filter_werkliste:
             }
         """
     )
+#Zuerst packen wir die Strings der gefilterten Werke (ohne diesen rdf URI Rotz vor der URI) in eine Liste.
     knotenliste.extend([str(filterwerk)])
+#Dann erstellen wir eine Typliste, wo der Knotentyp (in diesem Fall "work") für jedes Werk abgelegt
+#wird. Die werden später für die Attribute des jeweiligen Knoten gebraucht.
     typeliste.extend({"type": "work"})
+#Hier wird der Query dann erst wirklich ausgeführt. Für jedes gefundene Trope wird ein Tuple Eintrag
+#in der bipartiten Kantenliste angelegt, dann werden die einzelnen Tropes der Knotenliste hinzugefügt
+#und zu guter Letzt wird die Typliste mit dem Knotentyp "Trope" für jedes Trope erweitert.
     for trope in query_output:
         bipartite_kantenliste.append((str(filterwerk), str(trope[0])))
         knotenliste.extend([str(trope[0])])
         typeliste.extend([{"type": "trope"}])
+    
+#Hier kann man sich die einzelnen Listen anzeigen lassen.
+print(knotenliste)
+print(typeliste)
+print(bipartite_kantenliste)
