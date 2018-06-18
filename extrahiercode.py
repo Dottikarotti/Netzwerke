@@ -17,7 +17,6 @@ dbtropes_rdf.parse("/home/heckelenme/tvtropes_projektseminar/dbtropes_snapshot.n
 featureliste = []
 werkliste = []
 filter_werkliste = []
-tropeliste = []
 bipartite_kantenliste = []
 knotenliste = []
 typeliste = []
@@ -111,6 +110,8 @@ for filterwerk in filter_werkliste:
 #Der Query holt alle Tropes aus dem Datensatz, die über "processingCategory2" mit der 
 #ComedyTropes Ressource verbunden sind (sprich, alle Comedy Tropes). Es können auch andere
 #Trope "Kategorien" gesucht werden.
+trope_liste = []
+        
 query_output = dbtropes_rdf.query(
         """
         SELECT ?trope
@@ -122,7 +123,11 @@ query_output = dbtropes_rdf.query(
 
 #Ausführung und Füllen der Liste.
 for row in query_output:
-    tropeliste.extend(row)
+    trope_liste.extend(row)
+
+tropeliste = []
+for x in trope_liste:
+    tropeliste.extend([str(x)])
 
 #Test zum Anzeigen der Comedy Trope Liste.
 print(tropeliste)
