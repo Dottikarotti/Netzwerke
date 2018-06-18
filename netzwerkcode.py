@@ -13,14 +13,15 @@ Created on Mon Jun 11 13:38:24 2018
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 
 #Gebt hier jeweils den Pfad und Namen der Knoten bzw. Kantendatei an, die ihr aus der .zip
 #von GitHub entpackt habt.
 #Wichtig ist nur, dass ihr wirklich immer "\\" benutzt, zum Escapen des "\" Symbols im Pfad.
 #Außerdem solltet ihr immer nur ein Genre gleichzeitig bearbeiten (also eine _knoten und eine
 #_kanten Datei reinladen).
-df1 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\ratedmformanly_knoten")
-df2 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\ratedmformanly_kanten")
+df1 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\chickflick_knoten")
+df2 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\chickflick_kanten")
 
 #Hier könnt ihr Tropelisten importieren.
 df3 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\comedytropes")
@@ -29,7 +30,7 @@ df3 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\comedytro
 knotenliste = df1[0].values.tolist()
 typeliste = df1[1].values.tolist()
 bipartite_kantenliste = df2.values.tolist()
-tropeliste = df3.values.tolist()
+tropeliste = df3[0].values.tolist()
 
 #Der Inhalt der Kantenliste wurde beim Export in das DataFrame von Tupeln in Listen umgewandelt.
 #Diese Zeile macht das im Prinzip wieder rückgängig.
@@ -54,8 +55,56 @@ from networkx.algorithms import bipartite
 trope_nodes = [k for k, v in dict(knoten).items() if v["type"] ==  "trope" ]
 work_nodes = [k for k, v in dict(knoten).items() if v["type"] == "work" ]
 
-#???
+#Hier scheint ein Netzwerk erstellt zu werden, in dem nur Tropes vorkommen. Wofür das ganze ist,
+#weiß ich nicht. Wenn man das Netzwerk mit Gephi öffnet, kann man damit nicht so viel anfangen,
+#da irgendwie jedes Trope miteinander verbunden ist.
 trope_network_tropes_only = bipartite.projected_graph(trope_network, trope_nodes, multigraph=False)
 
 #Datei wird in Gephi-Format exportiert; Gebt hier einen Pfad auf eurem PC an.
 nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network.gexf")
+#Diese Zeile exportiert das Trope-Netzwerk. Momentan auskommentiert, siehe oben (trope_network_tropes_only)
+#nx.write_gexf(trope_network_tropes_only, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only.gexf")
+
+###### NETZWERKANALYSE MIT PYTHON ######
+
+### Trope Vergleich ###
+#Hier könnt ihr die Knotenliste mit einer der Tropelisten vergleichen.
+#Beide Listen werden als "sets" gespeichert, dann wird nach Überschneidungen gesucht und die
+#Ergebnisse in das Überschneidungsset gespeichert.
+#Dann wird über dieses Set in einer for-Schleife iteriert und die Matches in eine Matchliste
+#gepackt. Das Ergebnis sind alle Tropes, die in der Knoten - und Tropeliste auftauchen.
+vergleichsliste1 = set(knotenliste)
+vergleichsliste2 = set(tropeliste)
+ueberschneidungsset = vergleichsliste1.intersection(vergleichsliste2)
+matchliste  = []
+for match in ueberschneidungsset:
+    matchliste.append(match)
+
+#Anzahl der Elemente in der Matchliste.
+len(matchliste)
+#Anzahl der Elemente in der Tropeliste.
+len(tropeliste)
+
+#Anzahl der Werke in der Knotenliste:
+regex = re.compile(r'/Film/')
+werkknotenliste = list(filter(regex.search, knotenliste))
+len(werkknotenliste)
+#Anzahl der Tropes in der Knotenliste (WICHTIG: MOMENTAN "FEATURES", ES SIND ALSO NICHT NUR TROPES! FILTERN NÖTIG):
+regex = re.compile(r'/Main/')
+tropeknotenliste = list(filter(regex.search, knotenliste))
+len(tropeknotenliste)
+
+#Histogramm für Betweenness Centrality
+plt.hist(list(nx.betweenness_centrality(trope_network).values()), bins=100)
+plt.ylabel("Häufigkeit")
+plt.xlabel("Betweenness Centrality")
+plt.show()
+
+#Histogramm für Degree Centrality
+plt.hist(list(nx.degree_centrality(trope_network).values()), bins=100)
+plt.ylabel("Häufigkeit")
+plt.xlabel("Degree Centrality")
+plt.show()
+
+#Netzwerk zeichnen. Auskommentiert, da Python zum Erstellen von Netzwerkgrafiken scheiße ist.
+#nx.draw(trope_network)
