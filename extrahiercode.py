@@ -34,7 +34,7 @@ query_output = dbtropes_rdf.query(
         """
         SELECT ?feature
         WHERE {
-                ?feature <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbtropes.org/resource/Main/BlaxploitationParody>
+                ?feature <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbtropes.org/resource/Main/ChickFlick>
             }
         """
     )
@@ -70,6 +70,7 @@ regex = re.compile(r'/Film/')
 #In die Variable "filter_werkliste" wird eine Liste geschrieben, in der die Filme mithilfe der
 #Regular Expression aus der ursprünglichen Werkliste durch den regex.search Befehl gefiltert wurden.
 filter_werkliste = list(filter(regex.search, werkliste))
+filter_werkliste = list(set(filter_werkliste))
 #Dann erstellen wir eine Typliste, wo der Knotentyp (in diesem Fall "work") für jedes Werk abgelegt
 #wird. Die werden später für die Attribute des jeweiligen Knoten gebraucht.
 for filterwerk in filter_werkliste:
@@ -92,7 +93,8 @@ for filterwerk in filter_werkliste:
         SELECT ?trope
         WHERE {
             <""" + str(filterwerk) + """> <http://skipforward.net/skipforward/resource/seeder/skipinions/hasFeature> ?feature .
-            ?feature <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?trope
+            ?feature <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?trope .
+            ?trope <http://dbtropes.org/ont/processingCategory2> ?genre
             }
         """
     )
@@ -147,6 +149,6 @@ df2 = pd.DataFrame(bipartite_kantenliste)
 df3 = pd.DataFrame(tropeliste)
 
 #Einfach euren Benutzernamen einfügen und den Namen der Datei anpassen.
-df1.to_pickle("/home/schwarzersn/blaxploitationparody_knoten")
-df2.to_pickle("/home/schwarzersn/blaxploitationparody_kanten")
+df1.to_pickle("/home/schwarzersn/chickflick_knoten")
+df2.to_pickle("/home/schwarzersn/chickflick_kanten")
 df3.to_pickle("/home/schwarzersn/racetropes")
