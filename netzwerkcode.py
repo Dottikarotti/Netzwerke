@@ -67,32 +67,44 @@ nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\t
 
 ###### NETZWERKANALYSE MIT PYTHON ######
 
+#Leider besitzen alle Listen viele Duplikate von Tropes. Bei der Erstellung des Netzwerks werden
+#diese Duplikate automatisch entfernt, aber sie bleiben in den Python Listen. Mit diesen Befehlen
+#kann man neue Listen erstellen, in denen die Duplikate entfernt wurden. Diese kann man dann
+#eher für quantitative Analysen verwenden.
+knotenliste_nwa = list(set(knotenliste))
+bipartite_kantenliste_nwa = list(set(bipartite_kantenliste))
+
 ### Trope Vergleich ###
 #Hier könnt ihr die Knotenliste mit einer der Tropelisten vergleichen.
 #Beide Listen werden als "sets" gespeichert, dann wird nach Überschneidungen gesucht und die
 #Ergebnisse in das Überschneidungsset gespeichert.
 #Dann wird über dieses Set in einer for-Schleife iteriert und die Matches in eine Matchliste
 #gepackt. Das Ergebnis sind alle Tropes, die in der Knoten - und Tropeliste auftauchen.
-vergleichsliste1 = set(knotenliste)
+vergleichsliste1 = set(knotenliste_nwa)
 vergleichsliste2 = set(tropeliste)
 ueberschneidungsset = vergleichsliste1.intersection(vergleichsliste2)
-matchliste  = []
+matchliste_nwa  = []
 for match in ueberschneidungsset:
-    matchliste.append(match)
+    matchliste_nwa.append(match)
 
 #Anzahl der Elemente in der Matchliste.
-len(matchliste)
+len(matchliste_nwa)
 #Anzahl der Elemente in der Tropeliste.
 len(tropeliste)
 
+#Grad der einzelnen Knoten im Netzwerk berechnen. Leider nicht sehr übersichtlich; lieber
+#Gephi dafür verwenden, wenn man eine Übersicht haben möchte.
+grade = trope_network.degree()
+print(grade)
+
 #Anzahl der Werke in der Knotenliste:
 regex = re.compile(r'/Film/')
-werkknotenliste = list(filter(regex.search, knotenliste))
-len(werkknotenliste)
+werkknotenliste_nwa = list(filter(regex.search, knotenliste_nwa))
+len(werkknotenliste_nwa)
 #Anzahl der Tropes in der Knotenliste (WICHTIG: MOMENTAN "FEATURES", ES SIND ALSO NICHT NUR TROPES! FILTERN NÖTIG):
 regex = re.compile(r'/Main/')
-tropeknotenliste = list(filter(regex.search, knotenliste))
-len(tropeknotenliste)
+tropeknotenliste_nwa = list(filter(regex.search, knotenliste_nwa))
+len(tropeknotenliste_nwa)
 
 #Histogramm für Betweenness Centrality
 plt.hist(list(nx.betweenness_centrality(trope_network).values()), bins=100)
