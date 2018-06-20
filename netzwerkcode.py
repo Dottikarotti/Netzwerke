@@ -26,6 +26,9 @@ df2 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\chickflic
 #Hier könnt ihr Tropelisten importieren.
 df3 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\comedytropes")
 
+#Duplikate im Knoten-Dataframe löschen.
+df1 = df1.drop_duplicates(subset=0)
+
 #Hier werden die einzelnen Werte aus den DataFrames in Listen gepackt.
 knotenliste = df1[0].values.tolist()
 typeliste = df1[1].values.tolist()
@@ -35,6 +38,8 @@ tropeliste = df3[0].values.tolist()
 #Der Inhalt der Kantenliste wurde beim Export in das DataFrame von Tupeln in Listen umgewandelt.
 #Diese Zeile macht das im Prinzip wieder rückgängig.
 bipartite_kantenliste = list(tuple(x) for x in bipartite_kantenliste)
+#Duplikate in der Kantenliste löschen.
+bipartite_kantenliste = list(set(bipartite_kantenliste))
 
 #Knotenliste und Typeliste werden wieder zusammengefügt.
 knoten = list(zip(knotenliste, typeliste))
@@ -67,28 +72,21 @@ nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\t
 
 ###### NETZWERKANALYSE MIT PYTHON ######
 
-#Leider besitzen alle Listen viele Duplikate von Tropes. Bei der Erstellung des Netzwerks werden
-#diese Duplikate automatisch entfernt, aber sie bleiben in den Python Listen. Mit diesen Befehlen
-#kann man neue Listen erstellen, in denen die Duplikate entfernt wurden. Diese kann man dann
-#eher für quantitative Analysen verwenden.
-knotenliste_nwa = list(set(knotenliste))
-bipartite_kantenliste_nwa = list(set(bipartite_kantenliste))
-
 ### Trope Vergleich ###
 #Hier könnt ihr die Knotenliste mit einer der Tropelisten vergleichen.
 #Beide Listen werden als "sets" gespeichert, dann wird nach Überschneidungen gesucht und die
 #Ergebnisse in das Überschneidungsset gespeichert.
 #Dann wird über dieses Set in einer for-Schleife iteriert und die Matches in eine Matchliste
 #gepackt. Das Ergebnis sind alle Tropes, die in der Knoten - und Tropeliste auftauchen.
-vergleichsliste1 = set(knotenliste_nwa)
+vergleichsliste1 = set(knotenliste)
 vergleichsliste2 = set(tropeliste)
 ueberschneidungsset = vergleichsliste1.intersection(vergleichsliste2)
-matchliste_nwa  = []
+matchliste  = []
 for match in ueberschneidungsset:
-    matchliste_nwa.append(match)
+    matchliste.append(match)
 
 #Anzahl der Elemente in der Matchliste.
-len(matchliste_nwa)
+len(matchliste)
 #Anzahl der Elemente in der Tropeliste.
 len(tropeliste)
 
@@ -99,12 +97,12 @@ print(grade)
 
 #Anzahl der Werke in der Knotenliste:
 regex = re.compile(r'/Film/')
-werkknotenliste_nwa = list(filter(regex.search, knotenliste_nwa))
-len(werkknotenliste_nwa)
+werkknotenliste = list(filter(regex.search, knotenliste))
+len(werkknotenliste)
 #Anzahl der Tropes in der Knotenliste (WICHTIG: MOMENTAN "FEATURES", ES SIND ALSO NICHT NUR TROPES! FILTERN NÖTIG):
 regex = re.compile(r'/Main/')
-tropeknotenliste_nwa = list(filter(regex.search, knotenliste_nwa))
-len(tropeknotenliste_nwa)
+tropeknotenliste = list(filter(regex.search, knotenliste))
+len(tropeknotenliste)
 
 #Histogramm für Betweenness Centrality
 plt.hist(list(nx.betweenness_centrality(trope_network).values()), bins=100)
