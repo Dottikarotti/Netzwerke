@@ -118,7 +118,7 @@ len(tropeliste)
 regex = re.compile(r'/Film/')
 werkknotenliste = list(filter(regex.search, knotenliste))
 len(werkknotenliste)
-#Anzahl der Tropes in der Knotenliste (WICHTIG: MOMENTAN "FEATURES", ES SIND ALSO NICHT NUR TROPES! FILTERN NÖTIG):
+#Anzahl der Tropes in der Knotenliste (am besten vorher filtern, siehe oben (LISTEN VERFEINERN):
 regex = re.compile(r'/Main/')
 tropeknotenliste = list(filter(regex.search, knotenliste))
 len(tropeknotenliste)
@@ -194,7 +194,7 @@ plt.show()
 plt.hist(list(nx.eigenvector_centrality(trope_network).values()), bins=100)
 plt.hist(list(nx.eigenvector_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
-plt.xlabel("Degree Centrality")
+plt.xlabel("Eigenvector Centrality")
 plt.show()
 
 #Netzwerk zeichnen. Auskommentiert, da Python zum Erstellen von Netzwerkgrafiken scheiße ist.
