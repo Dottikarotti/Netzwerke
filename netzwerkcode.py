@@ -59,7 +59,7 @@ knoten = list(zip(knotenliste, typeliste))
 regex = re.compile(r'/Main/ChickFlick')
 #Erst suchen wir in den Knoten und erstellen eine neue Liste mit allen Knoten, die den String
 #"ChickFlick" nicht enthalten.
-knotenliste_gefiltert = [i for i in knoten if not regex.search(i[0])]
+knotenliste_gefiltert = [i for i in knotenliste if not regex.search(i)]
 knoten_gefiltert = [i for i in knoten if not regex.search(i[0])]
 #Dann das gleiche mit der Kantenliste.
 bipartite_kantenliste_gefiltert = [i for i in bipartite_kantenliste if not regex.search(i[1])]
