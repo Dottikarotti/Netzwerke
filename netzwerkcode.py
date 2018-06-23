@@ -68,7 +68,7 @@ knoten = knoten_gefiltert
 knotenliste = knotenliste_gefiltert
 bipartite_kantenliste = bipartite_kantenliste_gefiltert
 
-###### NETZWERK ERSTELLEN ######
+###### NETZWERK ERSTELLEN: Werke & Tropes als Knoten ######
 
 #Hier wird ein leerer Graph angelegt, in den erst die Knoten aus der zusammengelegten
 #Knotenliste (Variable "knoten") und dann die Kanten aus der bipartiten Kantenliste eingefügt werden
@@ -76,23 +76,22 @@ trope_network = nx.Graph()
 trope_network.add_nodes_from(knoten)
 trope_network.add_edges_from(bipartite_kantenliste)
 
-#Hier wird irgendwas namens "bipartite" importiert. Braucht man wohl für den nachfolgenden Code.
+#Datei wird in Gephi-Format exportiert; Gebt hier einen Pfad auf eurem PC an.
+nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network.gexf")
+
+##### Tropes als Knoten, Werke als Kanten #####
 from networkx.algorithms import bipartite
 
 #Hier wird der Inhalt aus der zusammengeführten Knotenliste in Werkknoten und Tropeknoten
-#aufgespalten. Dafür haben wir zuvor die Typliste gebraucht.
+#aufgespalten.
 trope_nodes = [k for k, v in dict(knoten).items() if v["type"] ==  "trope" ]
 work_nodes = [k for k, v in dict(knoten).items() if v["type"] == "work" ]
 
-#Hier scheint ein Netzwerk erstellt zu werden, in dem nur Tropes vorkommen. Wofür das ganze ist,
-#weiß ich nicht. Wenn man das Netzwerk mit Gephi öffnet, kann man damit nicht so viel anfangen,
-#da irgendwie jedes Trope miteinander verbunden ist.
+#Hier wird das Netzwerk erstellt.
 trope_network_tropes_only = bipartite.projected_graph(trope_network, trope_nodes, multigraph=False)
 
-#Datei wird in Gephi-Format exportiert; Gebt hier einen Pfad auf eurem PC an.
-nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network.gexf")
-#Diese Zeile exportiert das Trope-Netzwerk. Momentan auskommentiert, siehe oben (trope_network_tropes_only)
-#nx.write_gexf(trope_network_tropes_only, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only.gexf")
+#Export (ACHTUNG: Sehr viele Kanten)
+nx.write_gexf(trope_network_tropes_only, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only.gexf")
 
 ######~~ NETZWERKANALYSE MIT PYTHON ~~######
 
