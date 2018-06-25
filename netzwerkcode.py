@@ -26,27 +26,36 @@ import re
 #_kanten Datei reinladen).
 df1 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\chickflick_knoten")
 df2 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\chickflick_kanten")
+df4 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\ratedmformanly_knoten")
+df5 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\ratedmformanly_kanten")
 
 #Hier könnt ihr Tropelisten importieren.
 df3 = pd.read_pickle("C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\comedytropes")
 
 #Duplikate im Knoten-Dataframe löschen.
 df1 = df1.drop_duplicates(subset=0)
+df4 = df4.drop_duplicates(subset=0)
 
 #Hier werden die einzelnen Werte aus den DataFrames in Listen gepackt.
-knotenliste = df1[0].values.tolist()
-typeliste = df1[1].values.tolist()
-bipartite_kantenliste = df2.values.tolist()
+knotenliste_cf = df1[0].values.tolist()
+knotenliste_rmfm = df4[0].values.tolist()
+typeliste_cf = df1[1].values.tolist()
+typeliste_rmfm = df4[1].values.tolist()
+bipartite_kantenliste_cf = df2.values.tolist()
+bipartite_kantenliste_rmfm = df5.values.tolist()
 tropeliste = df3[0].values.tolist()
 
 #Der Inhalt der Kantenliste wurde beim Export in das DataFrame von Tupeln in Listen umgewandelt.
 #Diese Zeile macht das im Prinzip wieder rückgängig.
-bipartite_kantenliste = list(tuple(x) for x in bipartite_kantenliste)
+bipartite_kantenliste_cf = list(tuple(x) for x in bipartite_kantenliste_cf)
+bipartite_kantenliste_rmfm = list(tuple(x) for x in bipartite_kantenliste_rmfm)
 #Duplikate in der Kantenliste löschen.
-bipartite_kantenliste = list(set(bipartite_kantenliste))
+bipartite_kantenliste_cf = list(set(bipartite_kantenliste_cf))
+bipartite_kantenliste_rmfm = list(set(bipartite_kantenliste_rmfm))
 
 #Knotenliste und Typeliste werden wieder zusammengefügt.
-knoten = list(zip(knotenliste, typeliste))
+knoten_cf = list(zip(knotenliste_cf, typeliste_cf))
+knoten_rmfm = list(zip(knotenliste_rmfm, typeliste_rmfm))
 
 #Nun haben wir die gleichen Listen wie auf dem Server.
 
@@ -56,42 +65,60 @@ knoten = list(zip(knotenliste, typeliste))
 #Mit dieser Regular Expression wird der String in der URI spezifiziert, nach dem gesucht werden
 #soll. ChickFlick ist kein Trope, taucht aber trotzdem als Trope in den Listen auf. Das wollen
 #wir ändern.
-regex = re.compile(r'/Main/ChickFlick')
+regex_cf = re.compile(r'/Main/ChickFlick')
+regex_rmfm = re.compile(r'/Main/RatedMForManly')
 #Erst suchen wir in den Knoten und erstellen eine neue Liste mit allen Knoten, die den String
 #"ChickFlick" nicht enthalten.
-knotenliste_gefiltert = [i for i in knotenliste if not regex.search(i)]
-knoten_gefiltert = [i for i in knoten if not regex.search(i[0])]
+knotenliste_cf_gefiltert = [i for i in knotenliste_cf if not regex_cf.search(i)]
+knoten_cf_gefiltert = [i for i in knoten_cf if not regex_cf.search(i[0])]
 #Dann das gleiche mit der Kantenliste.
-bipartite_kantenliste_gefiltert = [i for i in bipartite_kantenliste if not regex.search(i[1])]
+bipartite_kantenliste_cf_gefiltert = [i for i in bipartite_kantenliste_cf if not regex_cf.search(i[1])]
 #Die alten Listen werden mit dem Inhalt der neuen gefilterten Listen ersetzt.
-knoten = knoten_gefiltert
-knotenliste = knotenliste_gefiltert
-bipartite_kantenliste = bipartite_kantenliste_gefiltert
+knoten_cf = knoten_cf_gefiltert
+knotenliste_cf = knotenliste_cf_gefiltert
+bipartite_kantenliste_cf = bipartite_kantenliste_cf_gefiltert
+
+#Das ganze nochmal für Rated M For Manly
+regex_rmfm = re.compile(r'/Main/RatedMForManly')
+knotenliste_rmfm_gefiltert = [i for i in knotenliste_rmfm if not regex_rmfm.search(i)]
+knoten_rmfm_gefiltert = [i for i in knoten_rmfm if not regex_rmfm.search(i[0])]
+bipartite_kantenliste_rmfm_gefiltert = [i for i in bipartite_kantenliste_rmfm if not regex_rmfm.search(i[1])]
+knoten_rmfm = knoten_rmfm_gefiltert
+knotenliste_rmfm = knotenliste_rmfm_gefiltert
+bipartite_kantenliste_rmfm = bipartite_kantenliste_rmfm_gefiltert
 
 ###### NETZWERK ERSTELLEN: Werke & Tropes als Knoten ######
 
 #Hier wird ein leerer Graph angelegt, in den erst die Knoten aus der zusammengelegten
 #Knotenliste (Variable "knoten") und dann die Kanten aus der bipartiten Kantenliste eingefügt werden
-trope_network = nx.Graph()
-trope_network.add_nodes_from(knoten)
-trope_network.add_edges_from(bipartite_kantenliste)
+trope_network_cf = nx.Graph()
+trope_network_cf.add_nodes_from(knoten_cf)
+trope_network_cf.add_edges_from(bipartite_kantenliste_cf)
+trope_network_rmfm = nx.Graph()
+trope_network_rmfm.add_nodes_from(knoten_rmfm)
+trope_network_rmfm.add_edges_from(bipartite_kantenliste_rmfm)
 
 #Datei wird in Gephi-Format exportiert; Gebt hier einen Pfad auf eurem PC an.
-nx.write_gexf(trope_network, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network.gexf")
+nx.write_gexf(trope_network_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_cf.gexf")
+nx.write_gexf(trope_network_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_rmfm.gexf")
 
 ##### Tropes als Knoten, Werke als Kanten #####
 from networkx.algorithms import bipartite
 
 #Hier wird der Inhalt aus der zusammengeführten Knotenliste in Werkknoten und Tropeknoten
 #aufgespalten.
-trope_nodes = [k for k, v in dict(knoten).items() if v["type"] ==  "trope" ]
-work_nodes = [k for k, v in dict(knoten).items() if v["type"] == "work" ]
+trope_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] ==  "trope" ]
+work_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] == "work" ]
+trope_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] ==  "trope" ]
+work_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] == "work" ]
 
 #Hier wird das Netzwerk erstellt.
-trope_network_tropes_only = bipartite.projected_graph(trope_network, trope_nodes, multigraph=False)
+trope_network_tropes_only_cf = bipartite.projected_graph(trope_network_cf, trope_nodes_cf, multigraph=False)
+trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
 
 #Export (ACHTUNG: Sehr viele Kanten)
-nx.write_gexf(trope_network_tropes_only, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only.gexf")
+nx.write_gexf(trope_network_tropes_only_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
+nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
 
 ######~~ NETZWERKANALYSE MIT PYTHON ~~######
 
@@ -101,7 +128,10 @@ nx.write_gexf(trope_network_tropes_only, "C:\\Users\\BlackEmperor\\Desktop\\Proj
 #Ergebnisse in das Überschneidungsset gespeichert.
 #Dann wird über dieses Set in einer for-Schleife iteriert und die Matches in eine Matchliste
 #gepackt. Das Ergebnis sind alle Tropes, die in der Knoten - und Tropeliste auftauchen.
-vergleichsliste1 = set(knotenliste)
+
+#Ihr könnt als Vergleichslisten folgende Variablen verwenden: knotenliste_cf, knotenliste_rmfm, tropeliste.
+#Einfach ersetzen.
+vergleichsliste1 = set(knotenliste_cf)
 vergleichsliste2 = set(tropeliste)
 ueberschneidungsset = vergleichsliste1.intersection(vergleichsliste2)
 matchliste  = []
@@ -115,17 +145,23 @@ len(tropeliste)
 
 #Anzahl der Werke in der Knotenliste:
 regex = re.compile(r'/Film/')
-werkknotenliste = list(filter(regex.search, knotenliste))
-len(werkknotenliste)
+werkknotenliste_cf = list(filter(regex.search, knotenliste_cf))
+len(werkknotenliste_cf)
+regex = re.compile(r'/Film/')
+werkknotenliste_rmfm = list(filter(regex.search, knotenliste_rmfm))
+len(werkknotenliste_rmfm)
 #Anzahl der Tropes in der Knotenliste (am besten vorher filtern, siehe oben (LISTEN VERFEINERN):
 regex = re.compile(r'/Main/')
-tropeknotenliste = list(filter(regex.search, knotenliste))
-len(tropeknotenliste)
+tropeknotenliste_cf = list(filter(regex.search, knotenliste_cf))
+len(tropeknotenliste_cf)
+regex = re.compile(r'/Main/')
+tropeknotenliste_rmfm = list(filter(regex.search, knotenliste_rmfm))
+len(tropeknotenliste_rmfm)
 
 #Grad der einzelnen Knoten im Netzwerk berechnen. Leider nicht sehr übersichtlich; lieber
 #Gephi dafür verwenden, wenn man eine Übersicht haben möchte.
-grade = trope_network.degree()
-print(grade)
+grade_cf = trope_network_cf.degree()
+grade_rmfm = trope_network_rmfm.degree()
 
 ##### KLEINERE NETZWERKE ERSTELLEN #####
 #Mit den berechneten Graden können wir in Python neue Listen erstellen, aus denen wir ein
@@ -134,7 +170,7 @@ print(grade)
 #1) Liste mit allen Elementen erstellen, deren Grad größer ist als x. Nützlich, um zum Beispiel
 #"unwichtigere" Tropes auszuschließen. Als Standardwert habe ich mal 2 ausgewählt, könnt ihr
 #aber auch ändern.
-gradliste = list(grade)
+gradliste = list(grade_cf)
 gefilterte_gradliste = []
 for i in gradliste:
     if i[1] > 2:
@@ -157,7 +193,7 @@ knoten_neu = list(zip(knotenliste_neu, typeliste_neu))
 bipartite_kantenliste_neu = []
 #Wenn das Trope im aktuellen Tuple-Element in der neuen Knotenliste auftaucht, wird das Tuple
 #in die neue Kantenliste geschrieben.
-bipartite_kantenliste_neu = [i for i in bipartite_kantenliste if i[1] in knotenliste_neu and i[0] in knotenliste_neu]
+bipartite_kantenliste_neu = [i for i in bipartite_kantenliste_cf if i[1] in knotenliste_neu and i[0] in knotenliste_neu]
         
 #6) Neues Netzwerk erstellen:
 trope_network_neu = nx.Graph()
@@ -169,28 +205,28 @@ nx.write_gexf(trope_network_neu, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbei
 ##### HISTOGRAMME ERSTELLEN #####
 
 #Histogramm für Betweenness Centrality (trope_network oder trope_network_neu)
-plt.hist(list(nx.betweenness_centrality(trope_network).values()), bins=100)
+plt.hist(list(nx.betweenness_centrality(trope_network_cf).values()), bins=100)
 plt.hist(list(nx.betweenness_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Betweenness Centrality")
 plt.show()
 
 #Histogramm für Degree Centrality
-plt.hist(list(nx.degree_centrality(trope_network).values()), bins=100)
+plt.hist(list(nx.degree_centrality(trope_network_cf).values()), bins=100)
 plt.hist(list(nx.degree_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Degree Centrality")
 plt.show()
 
 #Histogramm für Closeness Centrality
-plt.hist(list(nx.closeness_centrality(trope_network).values()), bins=100)
+plt.hist(list(nx.closeness_centrality(trope_network_cf).values()), bins=100)
 plt.hist(list(nx.closeness_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Closeness Centrality")
 plt.show()
 
 #Histogramm für Eigenvector Centrality
-plt.hist(list(nx.eigenvector_centrality(trope_network).values()), bins=100)
+plt.hist(list(nx.eigenvector_centrality(trope_network_cf).values()), bins=100)
 plt.hist(list(nx.eigenvector_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Eigenvector Centrality")
