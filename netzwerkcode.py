@@ -138,7 +138,7 @@ for element in knotenliste_rmfm:
 #Jetzt können wir die alten Knotenlisten mit den neuen Typelisten zusammenführen. Damit haben wir im Gephi-Datenlabor
 #neben der Spalte "type" zwei weitere Spalten, "comedy" und "genre".
 knoten_cf = list(zip(knotenliste_cf, typeliste_cf_neu))
-knoten_rmfm = list(zip(knotenliste_rmfm, typeliste_rmfm))
+knoten_rmfm = list(zip(knotenliste_rmfm, typeliste_rmfm_neu))
 
 #Nun haben wir die gleichen Listen wie auf dem Server.
 
@@ -204,7 +204,7 @@ nx.write_gexf(trope_network_tropes_only_cf, "C:\\Users\\BlackEmperor\\Desktop\\P
 trope_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] ==  "trope" ]
 work_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] == "work" ]
 trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
-nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
+nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
 
 
 ######~~ NETZWERKANALYSE MIT PYTHON ~~######
