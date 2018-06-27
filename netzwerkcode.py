@@ -53,8 +53,91 @@ bipartite_kantenliste_rmfm = list(tuple(x) for x in bipartite_kantenliste_rmfm)
 bipartite_kantenliste_cf = list(set(bipartite_kantenliste_cf))
 bipartite_kantenliste_rmfm = list(set(bipartite_kantenliste_rmfm))
 
-#Knotenliste und Typeliste werden wieder zusammengefügt.
-knoten_cf = list(zip(knotenliste_cf, typeliste_cf))
+#### COMEDYATTRIBUT & GENREATTRIBUT HINZUFÜGEN ####
+
+#Hier setzen wir drei Sets von Vergleichslisten auf, einmal die (Comedy)-Tropeliste, dann die Knotenliste aus
+#ChickFlicks und zuletzt die Knotenliste von Rated M For Manly. Dazu werden drei leere Matchlisten angelegt.
+vergleichsliste_tropes = set(tropeliste)
+vergleichsliste_g1 = set(knotenliste_cf)
+vergleichsliste_g2 = set(knotenliste_rmfm)
+matchliste_tropes_c_cf = []
+matchliste_tropes_c_rmfm = []
+matchliste_genre = []
+
+#Hier schauen wir, welche Einträge (im Prinzip nur Tropes) sowohl in den ChickFlick Knoten als auch in der Trope-
+#liste vorkommen. Diese Tropes werden in die Matchliste für Comedytropes (c) und ChickFlick (cf) eingetragen.
+ueberschneidungsset_tropes_cf = vergleichsliste_tropes.intersection(vergleichsliste_g1)
+for match in ueberschneidungsset_tropes_cf:
+    matchliste_tropes_c_cf.append(match)
+    
+#Das ganze wiederholen wir jetzt für die Rated M For Manly Knoten (rmfm).
+ueberschneidungsset_tropes_rmfm = vergleichsliste_tropes.intersection(vergleichsliste_g2)
+for match in ueberschneidungsset_tropes_rmfm:
+    matchliste_tropes_c_rmfm.append(match)
+    
+#Jetzt vergleichen wir die beiden Knotenlisten und schreiben alle Tropes in die Matchliste, die in beiden vorkommen.
+ueberschneidungsset_genre = vergleichsliste_g1.intersection(vergleichsliste_g2)
+for match in ueberschneidungsset_genre:
+    matchliste_genre.append(match)
+    
+#Wir legen nun für jedes der beiden Genres eine neue Typeliste an.
+typeliste_cf_neu = []
+typeliste_rmfm_neu = []
+
+#Wir erstellen nun eine Indexvariabel und setzen die auf 0. Die brauchen wir für die nächste Schleife.
+index = 0
+#Diese Schleife dient dazu, die Dictionaryeinträge in der Typeliste zu erweitern. Momentan sind dort die "types"
+#der Knoten ("work" oder "trope") gespeichert. Wir wollen für jedes Element ein Attribut "comedytrope" hinzufügen, 
+#das entweder mit "ja" oder "nein" belegt ist.
+#Wir untersuchen jedes Element der Knotenliste.
+for element in knotenliste_cf:
+    #Zunächst speichern wir das Element an der Stelle "index" in der alten Typeliste als Variable "dict_element" ab.
+    dict_element = typeliste_cf[index]
+    #Wenn das Element in der Matchliste für Comedytropes und ChickFlick auftaucht...
+    if element in matchliste_tropes_c_cf:
+        #...wird das Dictionary in der Variable "dict_element" um den Dictionaryeintrag mit dem Key "comedytrope"
+        #und dem Value "ja" erweitert.
+        dict_element.update({"comedytrope": "ja"})
+    #Wenn das Element dagegen nicht in der Matchliste auftaucht...
+    else:
+        #...wird der Eintrag stattdessen mit dem gleichen Key, aber dem Value "nein" erweitert.
+        dict_element.update({"comedytrope": "nein"})
+    #Als nächsten checken wir, ob das Element in der Genre-Matchliste auftaucht. Wenn ja...
+    if element in matchliste_genre:
+        #...erweitern wir den Eintrag mit einem Key "genre" und dem Wert "beide".
+        dict_element.update({"genre": "beide"})
+    #Wenn nicht...
+    else:
+        #...erhält der Key "genre" den Wert "Chick Flick".
+        dict_element.update({"genre": "Chick Flick"})
+    #Dieser neue, erweiterte Dictionaryeintrag wird nun der neuen Typeliste hinzugefügt.
+    typeliste_cf_neu.append(dict_element)
+    #Zuletzt erhöhen wir die Indexvariable um 1. Damit wird in der alten Typeliste das nächste Element ausgewählt,
+    #damit alles synchron zur Schleife hier abläuft, die ja über die Knotenliste läuft (sonst würde immer der
+    #Type-Eintrag des ersten Elements benutzt werden, also immer nur "type: work").
+    index += 1
+    #Die Schleife läuft solange weiter, bis alle Knoten in der Knotenliste abgearbeitet wurden.
+    
+#Das ganze wiederholen wir wieder für die Knotenliste von Rated M For Manly.
+index = 0
+for element in knotenliste_rmfm:
+    dict_element = typeliste_rmfm[index]
+    if element in matchliste_tropes_c_rmfm:
+        dict_element.update({"comedy": "ja"})
+        typeliste_rmfm_neu.extend([dict_element])
+    else:
+        dict_element.update({"comedy": "nein"})
+        typeliste_rmfm_neu.extend([dict_element])
+    if element in matchliste_genre:
+        dict_element.update({"genre": "beide"})
+    else:
+        dict_element.update({"genre": "Rated M For Manly"})
+    typeliste_rmfm_neu.extend([dict_element])
+    index += 1
+
+#Jetzt können wir die alten Knotenlisten mit den neuen Typelisten zusammenführen. Damit haben wir im Gephi-Datenlabor
+#neben der Spalte "type" zwei weitere Spalten, "comedy" und "genre".
+knoten_cf = list(zip(knotenliste_cf, typeliste_cf_neu))
 knoten_rmfm = list(zip(knotenliste_rmfm, typeliste_rmfm))
 
 #Nun haben wir die gleichen Listen wie auf dem Server.
@@ -66,7 +149,6 @@ knoten_rmfm = list(zip(knotenliste_rmfm, typeliste_rmfm))
 #soll. ChickFlick ist kein Trope, taucht aber trotzdem als Trope in den Listen auf. Das wollen
 #wir ändern.
 regex_cf = re.compile(r'/Main/ChickFlick')
-regex_rmfm = re.compile(r'/Main/RatedMForManly')
 #Erst suchen wir in den Knoten und erstellen eine neue Liste mit allen Knoten, die den String
 #"ChickFlick" nicht enthalten.
 knotenliste_cf_gefiltert = [i for i in knotenliste_cf if not regex_cf.search(i)]
@@ -94,52 +176,45 @@ bipartite_kantenliste_rmfm = bipartite_kantenliste_rmfm_gefiltert
 trope_network_cf = nx.Graph()
 trope_network_cf.add_nodes_from(knoten_cf)
 trope_network_cf.add_edges_from(bipartite_kantenliste_cf)
-trope_network_rmfm = nx.Graph()
-trope_network_rmfm.add_nodes_from(knoten_rmfm)
-trope_network_rmfm.add_edges_from(bipartite_kantenliste_rmfm)
 
 #Datei wird in Gephi-Format exportiert; Gebt hier einen Pfad auf eurem PC an.
 nx.write_gexf(trope_network_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_cf.gexf")
+
+#Der Einfachheit halber hier nochmal für Rated M For Manly:
+trope_network_rmfm = nx.Graph()
+trope_network_rmfm.add_nodes_from(knoten_rmfm)
+trope_network_rmfm.add_edges_from(bipartite_kantenliste_rmfm)
 nx.write_gexf(trope_network_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_rmfm.gexf")
 
-##### Tropes als Knoten, Werke als Kanten #####
+##### TROPES ALS KNOTEN, WERKE ALS KANTEN #####
 from networkx.algorithms import bipartite
 
 #Hier wird der Inhalt aus der zusammengeführten Knotenliste in Werkknoten und Tropeknoten
 #aufgespalten.
 trope_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] ==  "trope" ]
 work_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] == "work" ]
-trope_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] ==  "trope" ]
-work_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] == "work" ]
 
 #Hier wird das Netzwerk erstellt.
 trope_network_tropes_only_cf = bipartite.projected_graph(trope_network_cf, trope_nodes_cf, multigraph=False)
-trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
 
 #Export (ACHTUNG: Sehr viele Kanten)
 nx.write_gexf(trope_network_tropes_only_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
-nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
+
+#Und nochmal für Rated M For Manly.
+trope_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] ==  "trope" ]
+work_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] == "work" ]
+trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
+nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
+
 
 ######~~ NETZWERKANALYSE MIT PYTHON ~~######
 
-##### TROPE VERGLEICH #####
-#Hier könnt ihr die Knotenliste mit einer der Tropelisten vergleichen.
-#Beide Listen werden als "sets" gespeichert, dann wird nach Überschneidungen gesucht und die
-#Ergebnisse in das Überschneidungsset gespeichert.
-#Dann wird über dieses Set in einer for-Schleife iteriert und die Matches in eine Matchliste
-#gepackt. Das Ergebnis sind alle Tropes, die in der Knoten - und Tropeliste auftauchen.
-
-#Ihr könnt als Vergleichslisten folgende Variablen verwenden: knotenliste_cf, knotenliste_rmfm, tropeliste.
-#Einfach ersetzen.
-vergleichsliste1 = set(knotenliste_cf)
-vergleichsliste2 = set(tropeliste)
-ueberschneidungsset = vergleichsliste1.intersection(vergleichsliste2)
-matchliste  = []
-for match in ueberschneidungsset:
-    matchliste.append(match)
-
-#Anzahl der Elemente in der Matchliste.
-len(matchliste)
+#Anzahl der Elemente in der Comedytrope-ChickFlick Matchliste.
+len(matchliste_tropes_c_cf)
+#Anzahl der Elemente in der Comedytrope-Rated M For Manly Matchliste.
+len(matchliste_tropes_c_rmfm)
+#Anzahl der Elemente in der Genre-Matchliste.
+len(matchliste_genre)
 #Anzahl der Elemente in der Tropeliste.
 len(tropeliste)
 
@@ -161,7 +236,6 @@ len(tropeknotenliste_rmfm)
 #Grad der einzelnen Knoten im Netzwerk berechnen. Leider nicht sehr übersichtlich; lieber
 #Gephi dafür verwenden, wenn man eine Übersicht haben möchte.
 grade_cf = trope_network_cf.degree()
-grade_rmfm = trope_network_rmfm.degree()
 
 ##### KLEINERE NETZWERKE ERSTELLEN #####
 #Mit den berechneten Graden können wir in Python neue Listen erstellen, aus denen wir ein
@@ -204,33 +278,34 @@ nx.write_gexf(trope_network_neu, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbei
 
 ##### HISTOGRAMME ERSTELLEN #####
 
-#Histogramm für Betweenness Centrality (trope_network oder trope_network_neu)
+#Hier könnt ihr Histogramme zeichnen lassen. Wenn ihr das verkleinerte Netzwerk verwenden wollt, löscht das "#"
+#vor der jeweils zweiten "plt.hist(....)" Zeile raus und fügt es vor die erste Zeile ein, damit das richtige
+#Netzwerk ausgewählt ist.
+
+#Histogramm für Betweenness Centrality
 plt.hist(list(nx.betweenness_centrality(trope_network_cf).values()), bins=100)
-plt.hist(list(nx.betweenness_centrality(trope_network_neu).values()), bins=100)
+#plt.hist(list(nx.betweenness_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Betweenness Centrality")
 plt.show()
 
 #Histogramm für Degree Centrality
 plt.hist(list(nx.degree_centrality(trope_network_cf).values()), bins=100)
-plt.hist(list(nx.degree_centrality(trope_network_neu).values()), bins=100)
+#plt.hist(list(nx.degree_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Degree Centrality")
 plt.show()
 
 #Histogramm für Closeness Centrality
 plt.hist(list(nx.closeness_centrality(trope_network_cf).values()), bins=100)
-plt.hist(list(nx.closeness_centrality(trope_network_neu).values()), bins=100)
+#plt.hist(list(nx.closeness_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Closeness Centrality")
 plt.show()
 
 #Histogramm für Eigenvector Centrality
 plt.hist(list(nx.eigenvector_centrality(trope_network_cf).values()), bins=100)
-plt.hist(list(nx.eigenvector_centrality(trope_network_neu).values()), bins=100)
+#plt.hist(list(nx.eigenvector_centrality(trope_network_neu).values()), bins=100)
 plt.ylabel("Häufigkeit")
 plt.xlabel("Eigenvector Centrality")
 plt.show()
-
-#Netzwerk zeichnen. Auskommentiert, da Python zum Erstellen von Netzwerkgrafiken scheiße ist.
-#nx.draw(trope_network)
