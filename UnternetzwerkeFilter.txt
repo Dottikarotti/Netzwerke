@@ -1,0 +1,19 @@
+Unternetzwerke erstellen:
+
+1.) Netzwerk öffnen
+2.) Statistiken (rechts) -> Modularität berechnen
+3.) Layout: Force Atlas 2
+4.) Ausgestaltung (links) -> Farben -> Partition -> Modularity Class -> Anwenden
+5.) Filter (rechts) -> Attribute -> Partition -> Modularity Class (Knoten) auswählen und in das untere Fenster ("Filter hierher ziehen") verschieben
+6.) Bei "Partition (Modularity Class) Einstellungen" könnt ihr einzelne Unternetzwerke (oder mehrere gleichzeitig) auswählen und auf "Filter" klicken
+7.) Statistiken -> Mittlerer Grad berechnen
+8.) Ausgestaltung -> Größe -> Ranking -> Grad auswählen (Minimal und Maximalgröße so anpassen, dass es einigermaßen passt) -> Anwenden (Wenn ihr den Filter an habt, werden nur die gefilterten Knoten bearbeitet)
+
+Wenn ihr ein Unternetzwerk im Filter markiert habt:
+9.) Datenlabor -> Alle Knoten markieren -> Rechtsklick -> Kopieren nach... -> Neuen Arbeitsbereich anlegen (damit wird ein eigenes Netzwerk vom Unternetzwerk angelegt)
+Das kann man nun gesondert anschauen.
+
+Noch mehr Infos zu den Filtern:
+- Filter kann man mit Rechtsklick -> Entfernen wieder löschen
+- Wenn ihr "Operator -> INTERSECTION" auswählt, könnt ihr mehrere Filter übereinander legen (diese müssen Unterfilter von "INTERSECTION" sein!)
+- Bei "Topologie -> Ego Netzwerk" könnt ihr die ID eines Knoten angeben und schauen, wie er mit anderen Knoten verbunden ist (Tiefe 1 zeigt alle direkten Verbindungen, Tiefe 2 alle Verbindungen zu diesen Verbindungen, usw.)
