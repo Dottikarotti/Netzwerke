@@ -195,24 +195,22 @@ trope_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] ==  "trope"
 work_nodes_cf = [k for k, v in dict(knoten_cf).items() if v["type"] == "work" ]
 
 #Hier wird das Netzwerk erstellt.
-trope_network_tropes_only_cf = bipartite.projected_graph(trope_network_cf, trope_nodes_cf, multigraph=False)
+#trope_network_tropes_only_cf = bipartite.projected_graph(trope_network_cf, trope_nodes_cf, multigraph=False)
 
 #Gewichteten Graf erstellen (Kanten (Werke) mit vielen Verbindungen haben ein höheres Gewicht)
 trope_network_tropes_only_cf_gewichtet = bipartite.weighted_projected_graph(trope_network_cf, trope_nodes_cf)
 
 #Export (ACHTUNG: Sehr viele Kanten)
-nx.write_gexf(trope_network_tropes_only_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
-nx.write_gexf(trope_network_tropes_only_cf_gewichtet, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf_gewichtet.gexf")
+#nx.write_gexf(trope_network_tropes_only_cf, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
+nx.write_gexf(trope_network_tropes_only_cf_gewichtet, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_cf.gexf")
 
 #Und nochmal für Rated M For Manly.
 trope_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] ==  "trope" ]
 work_nodes_rmfm = [k for k, v in dict(knoten_rmfm).items() if v["type"] == "work" ]
-trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
-nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
-
-#Gewichteter Graph
+#trope_network_tropes_only_rmfm = bipartite.projected_graph(trope_network_rmfm, trope_nodes_rmfm, multigraph=False)
+#nx.write_gexf(trope_network_tropes_only_rmfm, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
 trope_network_tropes_only_rmfm_gewichtet = bipartite.weighted_projected_graph(trope_network_rmfm, trope_nodes_rmfm)
-nx.write_gexf(trope_network_tropes_only_rmfm_gewichtet, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm_gewichtet_gewichtet.gexf")
+nx.write_gexf(trope_network_tropes_only_rmfm_gewichtet, "C:\\Users\\BlackEmperor\\Desktop\\Projektarbeit\\trope_network_tropes_only_rmfm.gexf")
 
 ######~~ NETZWERKANALYSE MIT PYTHON ~~######
 
