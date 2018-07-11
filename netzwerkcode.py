@@ -124,15 +124,13 @@ for element in knotenliste_rmfm:
     dict_element = typeliste_rmfm[index]
     if element in matchliste_tropes_c_rmfm:
         dict_element.update({"comedy": "ja"})
-        typeliste_rmfm_neu.extend([dict_element])
     else:
         dict_element.update({"comedy": "nein"})
-        typeliste_rmfm_neu.extend([dict_element])
     if element in matchliste_genre:
         dict_element.update({"genre": "beide"})
     else:
         dict_element.update({"genre": "Rated M For Manly"})
-    typeliste_rmfm_neu.extend([dict_element])
+    typeliste_rmfm_neu.append(dict_element)
     index += 1
 
 #Jetzt können wir die alten Knotenlisten mit den neuen Typelisten zusammenführen. Damit haben wir im Gephi-Datenlabor
@@ -315,8 +313,26 @@ plt.ylabel("Häufigkeit")
 plt.xlabel("Eigenvector Centrality")
 plt.show()
 
-##### SUBGRAPHEN #####
-from networkx.algorithms import community
-communities_chickflick = community.girvan_newman(trope_network_cf)
-communities_chickflick = next(communities_chickflick)
-communities_chickflick_list = [list(comm) for comm in communities_chickflick]
+##### TROPE HÄUFIGKEIT ÜBER JAHRE #####
+
+import operator
+import itertools
+
+#ChickFlick
+itertool_liste1 = bipartite_kantenliste_cf
+itertool_liste1 = sorted(itertool_liste1,key=operator.itemgetter(0))
+split_kantenliste_cf = []
+for key,group in itertools.groupby(itertool_liste1,operator.itemgetter(0)):
+    split_kantenliste_cf.append(list(group))
+#Rated M For Manly
+itertool_liste2 = bipartite_kantenliste_rmfm
+itertool_liste2 = sorted(itertool_liste2,key=operator.itemgetter(0))
+split_kantenliste_rmfm = []
+for key,group in itertools.groupby(itertool_liste2,operator.itemgetter(0)):
+    split_kantenliste_rmfm.append(list(group))
+    
+regex = regex = re.compile(r'/Film/')
+werkliste_cf = list(filter(regex.search, knotenliste_cf))
+werkliste_rmfm = list(filter(regex.search, knotenliste_rmfm))
+for i in werkliste_cf:
+    i.replace("(.)+([A-Z])", "$1_$2")
